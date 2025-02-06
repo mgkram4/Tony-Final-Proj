@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Battle Simulator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="outer-container">
+        <div class="left-container">
+            <div class="top-container">
+                <h1>AI Battle Simulator</h1>
+                <p>Watch two AI agents compete in a game of Rock, Paper, Scissors!</p>
+                <p>Each round consists of 50 games. The results will be displayed below.</p>
+                
+                <div class="results-container">
+                    <h2>Battle Results</h2>
+                    <div id="results-list">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-container">
+                <button class="start-button" onclick="startSimulation()">Start New Round</button>
+            </div>
+        </div>
+        
+        <div class="right-container">
+            <div class="stats-card">
+                <h3>Current Round Stats</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Player 1 Wins:</span>
+                        <span class="stat-value" id="p1-wins">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Player 2 Wins:</span>
+                        <span class="stat-value" id="p2-wins">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Ties:</span>
+                        <span class="stat-value" id="ties">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function startSimulation() {
+            fetch('/simulate', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                updateStats(data);
+                addResultToList(data);
+            });
+        }
+
+        function updateStats(data) {
+            document.getElementById('p1-wins').textContent = data.player1_wins;
+            document.getElementById('p2-wins').textContent = data.player2_wins;
+            document.getElementById('ties').textContent = data.ties;
+        }
+
+        function addResultToList(data) {
+            const resultsList = document.getElementById('results-list');
+            const resultItem = document.createElement('div');
+            resultItem.className = 'result-item';
+            resultItem.innerHTML = `
+                <h4>Round ${data.round}</h4>
+                <p>Player 1: ${data.player1_wins} wins</p>
+                <p>Player 2: ${data.player2_wins} wins</p>
+                <p>Ties: ${data.ties}</p>
+            `;
+            resultsList.prepend(resultItem);
+        }
+    </script>
+</body>
+</html>
